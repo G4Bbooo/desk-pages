@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Fomo Desk">
+<meta name="theme-color" content="#000000">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="icon" sizes="any" href="icons/favicon.ico">
+<link rel="stylesheet" href="app.css?v=25">
+<title>Fomo Desk</title>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i></div>
+<div id="fx" aria-hidden="true"></div>
+
+<!-- Dynamic-island style trade banner (real trades only) -->
+<div id="island" class="island" aria-live="polite">
+  <div class="island-av" id="island-av"></div>
+  <div class="island-txt"><div class="k" id="island-k">FOMO DESK</div><div class="t" id="island-t"></div><div class="s" id="island-s"></div></div>
+  <div class="island-r" id="island-r"></div>
+</div>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="logo" id="logo"><img src="icons/logo-64.png" srcset="icons/logo-64.png 1x, icons/logo-128.png 2x, icons/logo-128.png 3x" width="38" height="38" alt="Fomo Desk" decoding="async"></div>
+      <div class="brand-txt">
+        <h1>Fomo Desk <span id="mode" class="chip paper" title="Display only — the desk never trades real money">PAPER</span></h1>
+        <div class="brand-sub" id="brand-sub">Solana graduates · strict RM</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <span id="live" class="chip live stale"><i class="pulse"></i><span id="live-label">Connecting</span></span>
+      <span id="session" class="session">—</span>
+      <span id="host" class="host-chip" title="Which computer is running the paper desk right now"></span>
+    </div>
+  </div>
+  <div class="book-bar" id="book-bar" hidden>
+    <div class="seg wide" id="book-seg" role="tablist" aria-label="Paper books">
+      <i class="seg-ink" id="book-ink"></i>
+    </div>
+  </div>
+  <div class="tape" id="tape" aria-label="Latest desk verdicts"><div class="tape-track" id="tape-track"></div></div>
+</header>
+
+<main>
+  <div id="skel" class="skel hidden" aria-hidden="true">
+    <div class="skel-hero shimmer"></div>
+    <div class="skel-chart shimmer"></div>
+    <div class="skel-list shimmer"></div>
+  </div>
+
+  <!-- DESK -->
+  <section id="tab-desk" class="tab active">
+    <div class="hero card glass">
+      <div class="hero-top">
+        <div class="hero-label" id="hero-label">Equity</div>
+        <div id="mult" class="mult">—</div>
+      </div>
+      <div class="big" id="equity" aria-live="polite">—</div>
+      <div class="hero-meta">
+        <span id="pnl" class="delta">—</span>
+        <span id="wl" class="wl">—</span>
+      </div>
+      <div class="chart-stage">
+        <canvas id="chart" height="150"></canvas>
+        <div class="chart-note hidden" id="chart-note"></div>
+        <div id="scrub" class="scrub hidden">
+          <div class="scrub-line"></div>
+          <div class="scrub-tip"><span id="scrub-val">—</span><span id="scrub-time" class="s">—</span></div>
+        </div>
+      </div>
+      <div class="ranges" id="ranges">
+        <i class="range-ink" id="range-ink"></i>
+        <button data-range="LIVE" class="on"><i class="ldot"></i>LIVE</button>
+        <button data-range="1H">1H</button>
+        <button data-range="4H">4H</button>
+        <button data-range="1D">1D</button>
+        <button data-range="1W">1W</button>
+        <button data-range="ALL">ALL</button>
+      </div>
+      <div class="goal" id="goal">
+        <div class="goal-l">GOAL</div>
+        <div class="goal-track"><i class="goal-fill" id="goal-fill"></i>
+          <span class="goal-m" style="left:30.1%" data-m="2"><i></i><b>2×</b></span>
+          <span class="goal-m" style="left:69.9%" data-m="5"><i></i><b>5×</b></span>
+          <span class="goal-m" style="left:100%" data-m="10"><i></i><b>10×</b></span>
+        </div>
+        <div class="goal-r" id="goal-r">—</div>
+      </div>
+    </div>
+
+    <div class="card desk-card">
+      <div class="card-head">
+        <h2>Desk · <span id="agents-n">6</span> agents</h2>
+        <span class="card-right" id="desk-funnel">—</span>
+      </div>
+      <div class="desk-rows" id="desk-rows"></div>
+    </div>
+
+    <div class="card pos-card">
+      <div class="card-head">
+        <h2>Positions <span class="count-badge" id="pos-badge">0</span></h2>
+        <div class="seg" id="pos-seg">
+          <i class="seg-ink" id="pos-ink"></i>
+          <button data-pos="open" class="on">Open</button>
+          <button data-pos="closed">Closed</button>
+        </div>
+      </div>
+      <div id="pos-list" class="pos-list"></div>
+    </div>
+
+    <div class="card logger">
+      <div class="card-head">
+        <h2>Logger</h2>
+        <span class="card-right down" id="log-killed">—</span>
+      </div>
+      <div class="log" id="log-mini"></div>
+      <button class="link-more press" data-goto="log">Open full log →</button>
+    </div>
+
+    <div class="card died">
+      <div class="card-head">
+        <h2>Why they died</h2>
+        <span class="card-right" id="died-scope">—</span>
+      </div>
+      <div class="died-grid" id="died"></div>
+    </div>
+    <div class="foot">Paper trading only · numbers are the desk's own published data</div>
+  </section>
+
+  <!-- AGENTS -->
+  <section id="tab-agents" class="tab">
+    <div class="sec-head"><h2>Agents</h2><span class="sec-right" id="agents-count">—</span></div>
+    <div class="agent-grid" id="agent-grid"></div>
+    <div class="agent-note">“Recent” counts use the desk’s latest published events · totals come from its coin funnel</div>
+  </section>
+
+  <!-- LOG -->
+  <section id="tab-log" class="tab">
+    <div class="card logger">
+      <div class="card-head"><h2>Logger</h2><span class="card-right" id="log-count">—</span></div>
+      <div class="log-filters seg wide" id="log-seg">
+        <i class="seg-ink" id="log-ink"></i>
+        <button data-lf="all" class="on">All</button>
+        <button data-lf="pass">Passed</button>
+        <button data-lf="kill">Killed</button>
+        <button data-lf="trade">Trades</button>
+      </div>
+      <div class="log full" id="log-full"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h2>Signals</h2><span class="card-right" id="sig-count">—</span></div>
+      <div id="signals" class="list"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="tab-settings" class="tab">
+    <div class="sec-head"><h2>Settings</h2><button type="button" class="set-x press" id="set-x" aria-label="Close settings">✕</button></div>
+    <div class="card list" id="settings"></div>
+    <div class="card note" id="push-note">
+      Display only. This app has no buy, sell, deposit or withdraw controls — the desk runs in PAPER mode and never places orders. Turn on Trade alerts in Settings to get a notification for every paper entry and exit.
+    </div>
+  </section>
+
+  <div id="nodata" class="card nodata hidden">
+    <div class="t">Connect your desk</div>
+    <div class="s">Paste your private desk link (or the code after <code>#d=</code>). The app remembers it on this phone.</div>
+    <input id="dlink" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://…#d=…">
+    <button id="dsave" class="btn press">Connect</button>
+  </div>
+</main>
+
+<div class="set-bd" id="set-bd" aria-hidden="true"></div>
+<nav class="dock">
+  <i class="dock-ink" id="dock-ink"></i>
+  <button data-tab="desk" class="on press" aria-label="Desk">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>
+    <span>Desk</span>
+  </button>
+  <button data-tab="agents" class="press" aria-label="Agents">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="4"/><path d="M12 8V5"/><circle cx="12" cy="4" r="1"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/></svg>
+    <span>Agents</span>
+  </button>
+  <button data-tab="log" class="press" aria-label="Log">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h13"/></svg>
+    <span>Log</span>
+  </button>
+  <button data-tab="settings" class="press" aria-label="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+    <span>Settings</span>
+  </button>
+</nav>
+
+<script src="chart.js?v=25"></script>
+<script src="app.js?v=25"></script>
+</body>
+</html>
